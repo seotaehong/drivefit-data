@@ -1,0 +1,36 @@
+# 공개 배포 저장소(drivefit-traffic 등)에 넣을 워크플로 (CP3-2d 템플릿, 2026-10-21).
+# latest.json이 push될 때마다 GitHub Pages로 배포한다. Actions 배포는 Pages의 "시간당 10회 빌드" 소프트 제한 대상이 아니다
+# (https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits).
+# 저장소 Settings → Pages → Source를 "GitHub Actions"로 바꿔야 동작한다(사용자).
+name: pages
+
+on:
+  push:
+    branches: [main]
+    paths: ['latest.json', 'index.html', 'README.md']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true   # 더 새 latest.json이 오면 이전 배포는 취소(최신만 의미 있음)
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deployment
+        uses: actions/deploy-pages@v4

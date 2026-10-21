@@ -1,0 +1,2 @@
+# 줄바꿈 변환 금지: publish.mjs가 latest.json 내용을 바이트 단위로 비교한다
+* -text
